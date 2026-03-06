@@ -1,7 +1,8 @@
+import os
 import pandas as pd
 import re
 
-DATA_PATH = "app/data/grievances.csv.zip"
+DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "data", "grievances.csv.zip")
 
 
 def clean_text(text):

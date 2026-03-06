@@ -7,14 +7,11 @@ from app.features.form.services.vision_service import extract_fields_from_image
 
 router = APIRouter(prefix="/form", tags=["Form"])
 
-UPLOAD_FOLDER = "temp_uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 
 @router.post("/extract")
 async def extract_form(file: UploadFile = File(...)):
 
-    file_path = f"{UPLOAD_FOLDER}/{file.filename}"
+    file_path = f"/tmp/{file.filename}"
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)

@@ -25,7 +25,9 @@ pydantic==2.12.5
 pydantic_core==2.41.5
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 python-multipart==0.0.22
+requests==2.32.3
 reportlab==4.4.10
 s3transfer==0.16.0
 scikit-learn==1.8.0

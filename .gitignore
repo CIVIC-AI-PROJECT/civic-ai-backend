@@ -38,3 +38,6 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+task-definition.json
+iam-logs-policy.json
+iam-secrets-policy.json
