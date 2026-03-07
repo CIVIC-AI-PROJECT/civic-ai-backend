@@ -1,6 +1,7 @@
 import os
 import json
 import base64
+import mimetypes
 import requests
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -12,23 +13,36 @@ def extract_fields_from_image(image_path):
 
     base64_image = base64.b64encode(image_bytes).decode("utf-8")
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key={GEMINI_API_KEY}"
+    if not GEMINI_API_KEY:
+        return {
+            "success": False,
+            "error": "GEMINI_API_KEY is not configured"
+        }
+
+    mime_type = mimetypes.guess_type(image_path)[0] or "image/jpeg"
+
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"gemini-pro-vision:generateContent?key={GEMINI_API_KEY}"
+    )
 
     payload = {
         "contents": [
             {
                 "parts": [
-                    {"text": """Extract the following fields from this ID document:
+                    {"text": """Extract the following fields from this ID document or handwritten form note:
 
                     - Full Name
                     - Date of Birth
                     - Address
                     - ID Number
+                    - Document Type
 
-                    Return ONLY valid JSON."""},
+                    Return ONLY valid JSON with keys:
+                    full_name, date_of_birth, address, id_number, document_type."""},
                     {
                         "inline_data": {
-                            "mime_type": "image/jpeg",
+                            "mime_type": mime_type,
                             "data": base64_image
                         }
                     }
@@ -37,16 +51,46 @@ def extract_fields_from_image(image_path):
         ]
     }
 
-    response = requests.post(url, json=payload)
+    try:
+        response = requests.post(url, json=payload, timeout=30)
+    except requests.RequestException as exc:
+        return {
+            "success": False,
+            "error": f"Vision API request failed: {str(exc)}"
+        }
 
     if response.status_code != 200:
-        return {"error": response.json()}
+        try:
+            details = response.json()
+        except Exception:
+            details = response.text
+
+        return {
+            "success": False,
+            "error": "Vision API returned non-200 response",
+            "details": details
+        }
 
     result = response.json()
 
-    text_output = result["candidates"][0]["content"]["parts"][0]["text"]
+    try:
+        text_output = result["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError, TypeError):
+        return {
+            "success": False,
+            "error": "Unexpected response format from Vision API",
+            "details": result
+        }
 
     try:
-        return json.loads(text_output)
+        parsed = json.loads(text_output)
+        return {
+            "success": True,
+            "data": parsed
+        }
     except Exception:
-        return {"raw_output": text_output}
+        return {
+            "success": False,
+            "error": "Model output was not valid JSON",
+            "raw_output": text_output
+        }
