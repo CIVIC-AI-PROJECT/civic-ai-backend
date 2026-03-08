@@ -12,6 +12,8 @@ from app.models.form_model import GeneratePdfRequest
 
 router = APIRouter(prefix="/form", tags=["Form"])
 
+UPLOAD_FOLDER = "/tmp"
+
 
 @router.post("/extract")
 async def extract_form(file: UploadFile = File(...)):
