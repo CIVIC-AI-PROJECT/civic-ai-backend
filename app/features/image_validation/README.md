@@ -8,8 +8,8 @@ Validates uploaded image quality before downstream processing.
 
 ## Key Files
 - `routes.py` → validation API endpoint
-- `services/blur_checker.py` → blur detection using Laplacian variance
+- `services/blur_checker.py` → blur, glare, and document border quality checks
 
 ## Notes for UI Integration
 - Use multipart upload with field name `file`.
-- API returns `blur_score`, `is_blurry`, and `threshold_used`.
+- API returns `blur`, `glare`, `border`, `is_acceptable`, and `suggestions`.

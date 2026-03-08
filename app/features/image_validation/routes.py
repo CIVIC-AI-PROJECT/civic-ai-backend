@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File
 import shutil
 import os
 
-from app.features.image_validation.services.blur_checker import check_blur
+from app.features.image_validation.services.blur_checker import run_quality_checks
 
 router = APIRouter(prefix="/image-validation", tags=["Image Validation"])
 
@@ -15,7 +15,7 @@ async def validate_image(file: UploadFile = File(...)):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    result = check_blur(file_path)
+    result = run_quality_checks(file_path)
 
     os.remove(file_path)
 
