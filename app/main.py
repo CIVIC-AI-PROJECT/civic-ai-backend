@@ -10,11 +10,8 @@ app = FastAPI(title="CIVIC.AI Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://main.d2rueo5r10xv7x.amplifyapp.com",
-        "https://d1gvv7q2zsapho.cloudfront.net",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
